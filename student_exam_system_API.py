@@ -18,23 +18,99 @@ def get_db_connection():
     )
     return conn
 
+# ADDD ---------------------------------------------------------
+
 @app.route('/student_exam_system/add_student', methods=['POST'])
 def add_student():
     data = request.get_json()
-    if not all(data.get(field) for field in ['first_name', 'last_name', 'sex', 'email']):
+    required_fields = ['first_name', 'last_name', 'sex', 'email']
+
+    if not all(field in data for field in required_fields):
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
         conn = get_db_connection()
-        conn.cursor().execute(
+        cursor = conn.cursor()
+        cursor.execute(
             "INSERT INTO Student (first_name, last_name, sex, email) VALUES (%s, %s, %s, %s)",
             (data['first_name'], data['last_name'], data['sex'], data['email'])
         )
         conn.commit()
+        cursor.close()
         conn.close()
-        return jsonify({'message': 'Student added'}), 201
+        return jsonify({'message': 'Student added successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/student_exam_system/add_semester', methods=['POST'])
+def add_semester():
+    try:
+        data = request.get_json()
+        if not all(data.get(field) for field in ['semester_name', 'start_date', 'end_date']):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO Semester (semester_name, start_date, end_date) VALUES (%s, %s, %s)",
+            (data['semester_name'], data['start_date'], data['end_date'])
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'message': 'Semester added successfully'}), 201
+    except:
+        return jsonify({'error': 'Failed to add semester'}), 500
+
+@app.route('/student_exam_system/add_exam', methods=['POST'])
+def add_exam():
+    try:
+        data = request.get_json()
+        if not all(data.get(field) for field in ['exam_date', 'semester_id']):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO Exam (exam_date, semester_id) VALUES (%s, %s)",
+            (data['exam_date'], data['semester_id'])
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'message': 'Exam added successfully'}), 201
+    except Exception as e:
+        return jsonify({'error': f'Failed to add exam: {str(e)}'}), 500
+
+@app.route('/student_exam_system/add_result_category', methods=['POST'])
+def add_result_category():
+    try:
+        data = request.get_json()
+        
+        # Validate the presence of required fields
+        required_fields = ['category_code', 'mark_low', 'mark_high', 'description']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f"Missing field: {field}"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO result_category (category_code, mark_low, mark_high, description) VALUES (%s, %s, %s, %s)",
+            (data['category_code'], data['mark_low'], data['mark_high'], data['description'])
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'message': 'Result category added successfully'}), 201
+    except Exception as e:
+        return jsonify({'error': f"Failed to add result category: {str(e)}"}), 500
+
+
+# READ -----------------------------------------------------------
 
 @app.route('/student_exam_system/all_students', methods=['GET'])
 def view_all_students():
@@ -61,6 +137,50 @@ def view_student(student_id):
         return jsonify({'error': 'Student not found'}), 404
     return jsonify(student)
 
+@app.route('/student_exam_system/view_semester', methods=['GET'])
+def view_semester():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Semester")
+        semesters = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'semesters': semesters}), 200
+    except:
+        return jsonify({'error': 'Failed to retrieve semesters'}), 500
+
+@app.route('/student_exam_system/view_exam', methods=['GET'])
+def view_exam():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Exam")
+        exams = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'exams': exams}), 200
+    except:
+        return jsonify({'error': 'Failed to retrieve exams'}), 500
+
+@app.route('/student_exam_system/view_result_categories', methods=['GET'])
+def view_result_categories():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM result_category")
+        categories = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'result_categories': categories}), 200
+    except:
+        return jsonify({'error': 'Failed to retrieve result categories'}), 500
+
+
+# UPDATE ------------------------------------------------------- 
 @app.route('/student_exam_system/update_student/<int:student_id>', methods=['PUT'])
 def update_student(student_id):
     data = request.get_json()
@@ -85,58 +205,6 @@ def update_student(student_id):
 
     return (jsonify({'message': 'Student updated successfully'}), 200) if row_count else (jsonify({'error': 'Student not found'}), 404)
 
-
-@app.route('/student_exam_system/delete_student/<int:student_id>', methods=['DELETE'])
-def delete_student(student_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM Student WHERE student_id = %s", (student_id,))
-    conn.commit()
-
-    row_count = cursor.rowcount 
-    cursor.close()
-    conn.close()
-
-    if row_count == 0:
-        return jsonify({'error': 'Student not found'}), 404
-    return jsonify({'message': 'Student deleted successfully'}), 200
-
-@app.route('/student_exam_system/add_semester', methods=['POST'])
-def add_semester():
-    try:
-        data = request.get_json()
-        if not all(data.get(field) for field in ['semester_name', 'start_date', 'end_date']):
-            return jsonify({'error': 'Missing required fields'}), 400
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO Semester (semester_name, start_date, end_date) VALUES (%s, %s, %s)",
-            (data['semester_name'], data['start_date'], data['end_date'])
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'message': 'Semester added successfully'}), 201
-    except:
-        return jsonify({'error': 'Failed to add semester'}), 500
-
-@app.route('/student_exam_system/view_semester', methods=['GET'])
-def view_semester():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Semester")
-        semesters = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'semesters': semesters}), 200
-    except:
-        return jsonify({'error': 'Failed to retrieve semesters'}), 500
-
 @app.route('/student_exam_system/update_semester/<int:semester_id>', methods=['PUT'])
 def update_semester(semester_id):
     data = request.get_json()
@@ -155,38 +223,6 @@ def update_semester(semester_id):
     if cursor.rowcount == 0:
         return jsonify({'error': 'Semester not found or no changes made'}), 404
     return jsonify({'message': 'Semester updated successfully'}), 200
-
-
-@app.route('/student_exam_system/delete_semester/<int:semester_id>', methods=['DELETE'])
-def delete_semester(semester_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM Semester WHERE semester_id = %s", (semester_id,))
-    
-    conn.commit()
-    row_count = cursor.rowcount
-    cursor.close()
-    conn.close()
-
-    if row_count == 0:
-        return jsonify({'error': 'Semester not found'}), 404
-    return jsonify({'message': 'Semester deleted successfully'}), 200
-
-@app.route('/student_exam_system/view_exam', methods=['GET'])
-def view_exam():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Exam")
-        exams = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'exams': exams}), 200
-    except:
-        return jsonify({'error': 'Failed to retrieve exams'}), 500
-
 
 @app.route('/student_exam_system/update_exam/<int:exam_id>', methods=['PUT'])
 def update_exam(exam_id):
@@ -207,57 +243,6 @@ def update_exam(exam_id):
         return jsonify({'error': 'Exam not found or no changes made'}), 404
     return jsonify({'message': 'Exam updated successfully'}), 200
 
-@app.route('/student_exam_system/delete_exam/<int:exam_id>', methods=['DELETE'])
-def delete_exam(exam_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM Exam WHERE exam_id = %s", (exam_id,))
-    
-    conn.commit()
-    row_count = cursor.rowcount
-    cursor.close()
-    conn.close()
-
-    if row_count == 0:
-        return jsonify({'error': 'Exam not found'}), 404
-    return jsonify({'message': 'Exam deleted successfully'}), 200
-
-@app.route('/student_exam_system/add_result_category', methods=['POST'])
-def add_result_category():
-    try:
-        data = request.get_json()
-        if not all(data.get(field) for field in ['category_code', 'mark_low', 'mark_high', 'description']):
-            return jsonify({'error': 'Missing required fields'}), 400
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO result_category (category_code, mark_low, mark_high, description) VALUES (%s, %s, %s, %s)",
-            (data['category_code'], data['mark_low'], data['mark_high'], data['description'])
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'message': 'Result category added successfully'}), 201
-    except:
-        return jsonify({'error': 'Failed to add result category'}), 500
-
-@app.route('/student_exam_system/view_result_categories', methods=['GET'])
-def view_result_categories():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM result_category")
-        categories = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        return jsonify({'result_categories': categories}), 200
-    except:
-        return jsonify({'error': 'Failed to retrieve result categories'}), 500
-
 @app.route('/student_exam_system/update_result_category/<string:category_code>', methods=['PUT'])
 def update_result_category(category_code):
     data = request.get_json()
@@ -277,6 +262,59 @@ def update_result_category(category_code):
         return jsonify({'error': 'Result category not found or no changes made'}), 404
     return jsonify({'message': 'Result category updated successfully'}), 200
 
+# DELETE -----------------------------------------------------------
+@app.route('/student_exam_system/delete_student/<int:student_id>', methods=['DELETE'])
+def delete_student(student_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM Student WHERE student_id = %s", (student_id,))
+    conn.commit()
+
+    row_count = cursor.rowcount 
+    cursor.close()
+    conn.close()
+
+    if row_count == 0:
+        return jsonify({'error': 'Student not found'}), 404
+    return jsonify({'message': 'Student deleted successfully'}), 200
+
+
+
+@app.route('/student_exam_system/delete_semester/<int:semester_id>', methods=['DELETE'])
+def delete_semester(semester_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM Semester WHERE semester_id = %s", (semester_id,))
+    
+    conn.commit()
+    row_count = cursor.rowcount
+    cursor.close()
+    conn.close()
+
+    if row_count == 0:
+        return jsonify({'error': 'Semester not found'}), 404
+    return jsonify({'message': 'Semester deleted successfully'}), 200
+
+
+
+@app.route('/student_exam_system/delete_exam/<int:exam_id>', methods=['DELETE'])
+def delete_exam(exam_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM Exam WHERE exam_id = %s", (exam_id,))
+    
+    conn.commit()
+    row_count = cursor.rowcount
+    cursor.close()
+    conn.close()
+
+    if row_count == 0:
+        return jsonify({'error': 'Exam not found'}), 404
+    return jsonify({'message': 'Exam deleted successfully'}), 200
+
 
 @app.route('/student_exam_system/delete_result_category/<string:category_code>', methods=['DELETE'])
 def delete_result_category(category_code):
@@ -292,6 +330,57 @@ def delete_result_category(category_code):
         return jsonify({'error': 'Result category not found'}), 404
     return jsonify({'message': 'Result category deleted successfully'}), 200
 
+
+# @app.route('/student_exam_system/delete_exam_result/<int:result_id>', methods=['DELETE'])
+# def delete_exam_result(result_id):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+
+#         # Remove dependencies in `exam` table
+#         update_exam_query = """
+#             UPDATE exam 
+#             SET exam_id = NULL 
+#             WHERE exam_id = (SELECT exam_id FROM exam_result WHERE result_id = %s)
+#         """
+#         cursor.execute(update_exam_query, (result_id,))
+#         conn.commit()
+
+#         # Remove dependencies in `result_category` table
+#         update_result_category_query = """
+#             UPDATE result_category 
+#             SET category_code = NULL 
+#             WHERE category_code = (SELECT category_code FROM exam_result WHERE result_id = %s)
+#         """
+#         cursor.execute(update_result_category_query, (result_id,))
+#         conn.commit()
+
+#         # Remove dependencies in `student` table
+#         update_student_query = """
+#             UPDATE student 
+#             SET student_id = NULL 
+#             WHERE student_id = (SELECT student_id FROM exam_result WHERE result_id = %s)
+#         """
+#         cursor.execute(update_student_query, (result_id,))
+#         conn.commit()
+
+#         # Delete from `exam_result` table
+#         delete_exam_result_query = "DELETE FROM exam_result WHERE result_id = %s"
+#         cursor.execute(delete_exam_result_query, (result_id,))
+#         conn.commit()
+
+#         if cursor.rowcount == 0:
+#             return jsonify({'error': 'Exam result not found'}), 404
+
+#         cursor.close()
+#         conn.close()
+#         return jsonify({'message': 'Exam result deleted successfully'}), 200
+
+#     except Exception as e:
+#         return jsonify({'error': 'An error occurred', 'details': str(e)}), 500
+
+    
+# ADDITIONAL READ JOINS ------------------------------------------------------
 
 @app.route('/student_exam_system/performance_summary/<int:student_id>', methods=['GET'])
 def performance_summary(student_id):
