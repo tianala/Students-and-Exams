@@ -1,11 +1,41 @@
--- FOR READING A RECORD
-curl -X GET http://localhost:5000/student_exam_system/
-
--- FOR DELETING A RECORD
+-- CREATE STUDENT
+curl -X POST http://localhost:5000/student_exam_system/add_student -H "Content-Type: application/json" -d "{\"first_name\":\"John\",\"last_name\":\"Doe\",\"sex\":0,\"email\":\"johndoe@example.com\"}"
+-- READ SPECIFIC STUDENT
+curl -X GET http://localhost:5000/student_exam_system/view_student/1
+-- READ ALL STUDENTS
+curl -X GET http://localhost:5000/student_exam_system/view_all_students
+-- UPDATE STUDENT
+curl -X PUT http://localhost:5000/student_exam_system/update_student/29 -H "Content-Type: application/json" -d "{\"first_name\":\"John\",\"last_name\":\"Doe\",\"sex\":1,\"email\":\"johndoe22@example.com\"}"
+-- DELETING STUDENT
 curl -X DELETE http://localhost:5000/student_exam_system/delete_student/1
 
--- FOR ADDING A RECORD
-curl -X POST http://localhost:5000/student_exam_system/add_student -H "Content-Type: application/json" -d "{\"first_name\":\"John\",\"last_name\":\"Doe\",\"sex\":0,\"email\":\"johndoe@example.com\"}"
+
+-- CREATE EXAM
+curl -X POST http://localhost:5000/student_exam_system/add_exam -H "Content-Type: application/json" -d "{\"exam_date\": \"2024-01-15\", \"semester_id\": 2}"
+-- READ ALL EXAMS
+curl -X GET http://localhost:5000/student_exam_system/view_exam
+-- UPDATE EXAM
+curl -X PUT http://localhost:5000/student_exam_system/update_exam/3 -H "Content-Type: application/json" -d "{\"exam_date\": \"2024-02-15\", \"semester_id\": 1}"
+-- DELETING EXAM
+curl -X DELETE http://localhost:5000/student_exam_system/delete_exam/1
 
 
--- FOR UPDATING A RECORD
+-- CREATE SEMESTER
+curl -X POST http://localhost:5000/student_exam_system/add_semester -H "Content-Type: application/json" -d "{\"semester_name\":\"3rd Semester\",\"start_date\": \"2024-02-15\",\"end_date\": \"2024-12-15\"}"
+-- READ ALL SEMESTERS
+curl -X GET http://localhost:5000/student_exam_system/view_semester
+-- UPDATE SEMESTER
+curl -X PUT http://localhost:5000/student_exam_system/update_semester/3 -H "Content-Type: application/json" -d "{\"semester_name\":\"3rd Semester\",\"start_date\": \"2024-02-15\",\"end_date\": \"2024-12-15\"}"
+-- DELETING SEMESTER 
+curl -X DELETE http://localhost:5000/student_exam_system/delete_semester/1
+
+
+-- CREATE RESULT CATEGORY
+curl -X POST http://localhost:5000/student_exam_system/add_result_category -H "Content-Type:application/json" -d "{\"category_code\":\"GG\",\"mark_low\":0,\"mark_high\":0,\"description\":\"00\"}"
+-- READ RESULT CATEGORY
+curl -X GET http://localhost:5000/student_exam_system/view_result_categories
+-- UPDATE RESULT CATEGORY
+curl -X PUT http://localhost:5000/student_exam_system/update_result_category/"G" -H "Content-Type:application/json" -d "{\"category_code\":\"GG\",\"mark_low\":0,\"mark_high\":0,\"description\":\"00\"}"
+-- DELETE RESULT CATEGORY
+curl -X DELETE http://localhost:5000/student_exam_system/delete_result_category/G
+
