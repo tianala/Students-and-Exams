@@ -38,4 +38,3 @@ curl -X GET http://localhost:5000/student_exam_system/view_result_categories
 curl -X PUT http://localhost:5000/student_exam_system/update_result_category/"G" -H "Content-Type:application/json" -d "{\"category_code\":\"GG\",\"mark_low\":0,\"mark_high\":0,\"description\":\"00\"}"
 -- DELETE RESULT CATEGORY
 curl -X DELETE http://localhost:5000/student_exam_system/delete_result_category/G
-
