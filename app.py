@@ -132,7 +132,7 @@ def login():
 
 @app.route("/add_student", methods=["POST"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def add_student():
     data = request.get_json()
     required_fields = ["first_name", "last_name", "sex", "email"]
@@ -157,7 +157,7 @@ def add_student():
 
 @app.route("/add_semester", methods=["POST"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def add_semester():
     data = request.get_json()
     if not all(data.get(field) for field in ["semester_name", "start_date", "end_date"]):
@@ -179,7 +179,7 @@ def add_semester():
     
 @app.route("/add_exam", methods=["POST"])
 @token_required
-@role_required(["admin"])
+@role_required(["teacher", "administrator"])
 def add_exam():
     data = request.get_json()
     if not all(data.get(field) for field in ["exam_date", "semester_id"]):
@@ -201,7 +201,7 @@ def add_exam():
     
 @app.route("/add_result_category", methods=["POST"])
 @token_required
-@role_required(["admin"])
+@role_required(["administrator"])
 def add_result_category():
     data = request.get_json()
     required_fields = ["category_code", "mark_low", "mark_high", "description"]
@@ -306,7 +306,7 @@ def view_result_categories():
 # UPDATE ------------------------------------------------------- 
 @app.route("/update_student/<int:student_id>", methods=["PUT"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def update_student(student_id):
     data = request.get_json()
 
@@ -333,7 +333,7 @@ def update_student(student_id):
 
 @app.route("/update_semester/<int:semester_id>", methods=["PUT"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def update_semester(semester_id):
     data = request.get_json()
     conn = get_db_connection()
@@ -377,7 +377,7 @@ def update_exam(exam_id):
 
 @app.route("/update_result_category/<string:category_code>", methods=["PUT"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 
 def update_result_category(category_code):
     data = request.get_json()
@@ -401,7 +401,7 @@ def update_result_category(category_code):
 
 @app.route("/delete_student/<int:student_id>", methods=["DELETE"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def delete_student(student_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -421,7 +421,7 @@ def delete_student(student_id):
 
 @app.route("/delete_semester/<int:semester_id>", methods=["DELETE"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def delete_semester(semester_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -460,7 +460,7 @@ def delete_exam(exam_id):
 
 @app.route("/delete_result_category/<string:category_code>", methods=["DELETE"])
 @token_required
-@role_required(["teacher", "administrator"])
+@role_required(["administrator"])
 def delete_result_category(category_code):
     conn = get_db_connection()
     cursor = conn.cursor()
