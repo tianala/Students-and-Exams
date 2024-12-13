@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Exam System</title>
+    <style>
+        /* Reset styles */
+        body, h1, h2, h3, p, ul, li, a {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF4E6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .main-container {
+            background: white;
+            width: 100%;
+            max-width: 1000px; /* Increased width */
+            height: 400%; /* Adjusted height */
+            min-height: 300px; /* Extended height */
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Increased shadow */
+            border-radius: 15px; /* Rounded corners */
+            overflow: hidden;
+            margin: 20px auto;
+            padding: 40px; /* Increased padding */
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 30px; /* Increased margin */
+            color: #FF6A00;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6; /* Increased line spacing */
+        }
+
+        .button-container {
+            margin-top: 40px; /* Increased margin */
+        }
+
+        a.button {
+            display: inline-block;
+            background-color: #FF7F11;
+            color: white;
+            padding: 15px 30px; /* Increased padding */
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        a.button:hover {
+            background-color: #FF6A00;
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px; /* Increased margin */
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container">
+            <h1>Welcome to the Student Exam System</h1>
+            <p>You can interact with the database through some of these endpoints. Use the provided routes to interact with the API.<br> Make sure to include valid authentication tokens where needed to ensure secure access.</p>
+            <div class="button-container">
+                <a href="/register" class="button">Register</a>
+                <a href="/login" class="button">Login</a>
+                <a href="/view_student" class="button">View Student</a>
+                <a href="/view_exams" class="button">View Exam Schedules</a>
+                <a href="/view_semesters" class="button">View Semester</a>
+                <a href="/view_result_categories" class="button">View Result Categories</a>
+            </div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2024 Student Exam System. All rights reserved.
+    </footer>
+</body>
+</html>
