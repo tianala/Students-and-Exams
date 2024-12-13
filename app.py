@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import jwt
 import datetime
 import mysql.connector
@@ -127,6 +127,10 @@ def login():
             return jsonify({"token": token}), 200
 
     return handle_error("Invalid credentials", 401)
+
+@app.route("/")
+def main_page():
+    return render_template("main_page.html")
 
 # ADDD ---------------------------------------------------------
 
